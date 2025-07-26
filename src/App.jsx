@@ -20,9 +20,9 @@ function App() {
     {
       path: "/",
       element: (
-        <ProtectedRoutes user={user}>
+        <Login user={user}>
           <MainLayout />
-        </ProtectedRoutes>
+        </Login>
       ),
       children: [
         {
