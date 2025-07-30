@@ -26,7 +26,6 @@ export const useSignup = () => {
         photoURL: `https://api.dicebear.com/7.x/initials/svg?seed=${name}`,
       });
 
-      // User object to save
       const userData = {
         name: res.user.displayName,
         email: res.user.email,
@@ -34,7 +33,6 @@ export const useSignup = () => {
         photoURL: res.user.photoURL,
       };
 
-      // Save to Redux and localStorage
       dispatch(loginAction(userData));
       localStorage.setItem("user", JSON.stringify(userData));
 

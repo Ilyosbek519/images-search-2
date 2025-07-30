@@ -1,13 +1,13 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { logout } from "../app/features/userSlice"; // ❗️ logout ni to‘g‘ri import qiling
+import { logout } from "../app/features/userSlice"; 
 
 function Navbar() {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.user);
 
   const handleLogout = () => {
-    dispatch(logout()); // ❗️ logout chaqirilmoqda
+    dispatch(logout()); 
   };
 
   return (

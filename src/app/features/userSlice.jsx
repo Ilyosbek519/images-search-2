@@ -12,11 +12,11 @@ const userSlice = createSlice({
   reducers: {
     login: (state, { payload }) => {
       state.user = payload;
-      localStorage.setItem("user", JSON.stringify(payload)); // foydalanuvchini saqlash
+      localStorage.setItem("user", JSON.stringify(payload)); 
     },
     logout: (state) => {
       state.user = null;
-      localStorage.removeItem("user"); // foydalanuvchini o‘chirish
+      localStorage.removeItem("user"); 
     },
   },
 });
