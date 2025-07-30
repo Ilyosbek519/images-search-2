@@ -1,41 +1,42 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   createBrowserRouter,
   Navigate,
   RouterProvider,
 } from "react-router-dom";
-import ProtectedRoutes from "./components/ProtectedRoutes";
-import MainLayout from "./layout/MainLayout";
-
-import {Home, Login, Profile, Signup, Singlelmage} from "./pages"
-import "../src/index.css";
-
-import { useSelector } from "react-redux";
-
+import MainLayout from "../src/layout/MainLayout";
+import { Home, Login, Profile, Signup, SingleImage } from "./pages";
+import { useDispatch, useSelector } from "react-redux";
+import { login } from "../src/app/features/userSlice";
 
 
 function App() {
+  const dispatch = useDispatch();
   const { user } = useSelector((store) => store.user);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser && !user) {
+      dispatch(login(JSON.parse(storedUser)));
+    }
+  }, [dispatch, user]);
+
   const routes = createBrowserRouter([
     {
       path: "/",
-      element: (
-        <Login user={user}>
-          <MainLayout />
-        </Login>
-      ),
+      element: user ? <MainLayout /> : <Navigate to="/login" />,
       children: [
         {
           index: true,
           element: <Home />,
         },
         {
-          path: "/profile",
+          path: "profile",
           element: <Profile />,
         },
         {
-          path: "/singleImage/:id",
-          element: <Singlelmage />,
+          path: "singleImage/:id",
+          element: <SingleImage />,
         },
       ],
     },
@@ -48,6 +49,7 @@ function App() {
       element: user ? <Navigate to="/" /> : <Signup />,
     },
   ]);
+
   return <RouterProvider router={routes} />;
 }
 

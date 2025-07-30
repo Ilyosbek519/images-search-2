@@ -1,20 +1,22 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
+import { useLogin } from "../hooks/useLogin";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 export default function LoginPage() {
+  const { isPending, login } = useLogin();
+  const user = useSelector((state) => state.user.user);
+  const navigate = useNavigate();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
-  useEffect(() => {
-    const user = localStorage.getItem("user");
-    if (user) {
-      setIsLoggedIn(true);
-    }
-  }, []);
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
     const validationErrors = {};
     if (!email) validationErrors.email = "Email kiritilishi shart";
     if (!password) validationErrors.password = "Parol kiritilishi shart";
@@ -23,9 +25,10 @@ export default function LoginPage() {
       setErrors(validationErrors);
     } else {
       setErrors({});
-      console.log("Email:", email);
-      console.log("Password:", password);
+      await login(email, password);
       localStorage.setItem("user", JSON.stringify({ email }));
+      navigate("/");
+      
     }
   };
 
@@ -51,29 +54,31 @@ export default function LoginPage() {
         <div className="relative z-10 bg-white/30 backdrop-blur-md p-8 rounded-xl shadow-xl w-full max-w-md mx-4 border border-white/40">
           <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">Login</h2>
 
-          {isLoggedIn && (
+          {user && (
             <div className="bg-green-100 text-green-700 p-3 rounded mb-4 text-center">
-              Siz allaqachon tizimga kirgansiz. <a href="/profile" className="underline">Profilga o'tish</a> yoki <a href="/signup" className="underline">Ro‘yxatdan o‘tgan bo‘lsangiz — Login sahifaga qaytish</a>
+              Siz tizimga kirgansiz.{" "}
+              <a href="/profile" className="underline">Profilga o'tish</a> yoki{" "}
+              <a href="/signup" className="underline">Yangi akkaunt yaratish</a>
             </div>
           )}
 
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div>
               <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 ${
-              errors.email ? "border-red-500 focus:ring-red-500" : "border-gray-300 focus:ring-blue-500"
-            }`}
-          />
-          {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 ${
+                  errors.email ? "border-red-500 focus:ring-red-500" : "border-gray-300 focus:ring-blue-500"
+                }`}
+              />
+              {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
             </div>
 
-            <div>
+            <div className="relative">
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -81,21 +86,31 @@ export default function LoginPage() {
                   errors.password ? "border-red-500 focus:ring-red-500" : "border-gray-300 focus:ring-blue-500"
                 }`}
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600"
+              >
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
               {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
             </div>
 
             <button
               type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition duration-300"
+              disabled={isPending}
+              className={`w-full ${
+                isPending ? "bg-blue-400" : "bg-blue-600 hover:bg-blue-700"
+              } text-white font-semibold py-3 rounded-lg transition duration-300`}
             >
-              Login
+              {isPending ? "Yuklanmoqda..." : "Login"}
             </button>
           </form>
 
           <p className="mt-4 text-center text-sm text-gray-600">
-            Don’t have an account?{" "}
+            Hali akkauntingiz yo‘qmi?{" "}
             <a href="/signup" className="text-blue-600 hover:underline font-medium">
-              Sign up
+              Ro‘yxatdan o‘tish
             </a>
           </p>
         </div>
